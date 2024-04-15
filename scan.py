@@ -10,21 +10,27 @@ def scan(img, w, h):
     # edge detection
     imthresh = cv.Canny(imblur, 0, 50)
 
-    # find all contours
+    # find biggest contours
     contours, heirarchy = cv.findContours(imthresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key=cv.contourArea, reverse=True)
 
-    biggest = np.array([[[0, 0]], [[w, 0]], [[w, h]], [[0, h]]])
-    max_area = 0
-    for contour in contours:
-        area = cv.contourArea(contour)
-        print(area)
-        if area > 5000:
-            peri = cv.arcLength(contour, True)
-            approx = cv.approxPolyDP(contour, 0.02 * peri, True)
-            if area > max_area and len(approx) == 4:
-                biggest = approx
-                max_area = area
+    win = np.array([[[0, 0]], [[w, 0]], [[w, h]], [[0, h]]])
+    biggest = win
+    contour = contours[0]
+    area = cv.contourArea(contour)
+    for i in contours:
+        print(cv.contourArea(i))
+
+    if area > 200:
+        approx = cv.approxPolyDP(contour, 0.02 * cv.arcLength(contour, True), True)
+        if len(approx) == 4:
+            biggest = approx
+
+    # warp perspective
+    matrix = cv.getPerspectiveTransform(np.float32(biggest), np.float32(win))
+    imwarp = cv.warpPerspective(img, matrix, (w, h))
+
+    cv.drawContours(img, biggest, -1, (0, 255, 0), 10)
 
     print(biggest)
-    return biggest
+    return imwarp
