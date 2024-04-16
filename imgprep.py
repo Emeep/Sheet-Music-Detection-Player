@@ -1,9 +1,11 @@
 import cv2 as cv
+import configparser as cp
 
 def prep(img):
-    w, h = 600, 800
-    if img.shape[0] < img.shape[1]:
-        w, h = 800, 600
+    config = cp.ConfigParser()
+    config.read('config.ini')
+
+    w, h = int(config.get('Resize', 'w')), int(config.get('Resize', 'h'))
     img = cv.resize(img, (w, h))
 
     roi = cv.selectROI('select roi', img)
