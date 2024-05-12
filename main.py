@@ -3,11 +3,14 @@ import os
 
 input_dir = os.listdir('input')
 
-img = cv.imread(f'input/{input_dir[0]}')
+img = cv.imread(f'input/Untitled-1.png')
 
-import imgprep
-cv.imshow('win', imgprep.prep(img))
+# import imgprep
+# import time
 
-if cv.waitKey(0):
-    cv.destroyAllWindows()
-    exit()
+# os.chdir('output')
+# while True:
+#     prepped = imgprep.prep(img)
+#     cv.imwrite(f'{str(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())).replace(".", "").replace(":", "")}.jpg', 
+#             prepped)
+#     cv.imshow('win', prepped)
