@@ -90,6 +90,7 @@ def remove_single_line(line_thickness, line_start, in_img, width):
 
 def remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses):
     it = 0
+    coords = []
 
     # Iterate over all staff lines and remove them line by line#
     while it < len(staff_lines):
@@ -97,9 +98,11 @@ def remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses):
         line_thickness = staff_lines_thicknesses[it]
         in_img = remove_single_line(line_thickness, line_start, in_img, width)
 
+        coords.append(line_start)
+
         it += 1
         
-    return in_img
+    return in_img, coords
 
 def cut_image_into_buckets(in_img, staff_lines):
     # List of cutted buckets images and positions of cutting #
