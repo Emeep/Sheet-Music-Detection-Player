@@ -83,9 +83,11 @@ def resize(img, size):
     border_y = (size - height)//2
     border_x = (size - width)//2
 
-    print(border_x, border_y)
+    xdiff = size - ((2 * border_x) + width)
+    ydiff = size - ((2 * border_y) + height)
+
     # top, bottom, left, right
-    img = cv.copyMakeBorder(img, border_y, border_y, border_x, border_x,
+    img = cv.copyMakeBorder(img, border_y, border_y + ydiff, border_x, border_x + xdiff,
                             cv.BORDER_CONSTANT, None, value = (255,255,255)) 
 
     print(img.shape)

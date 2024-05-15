@@ -8,6 +8,8 @@ import configparser as cp
 from PIL import Image
 from ultralytics import YOLO
 
+from statistics import mean
+
 path_in = "input/Screenshot 2024-05-11 135411.png"
 path_out = "output"
 
@@ -22,14 +24,16 @@ img = cv2.fastNlMeansDenoising(img, None, 10, 7, 21)
 _threshold, in_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
 staff_lines_thicknesses, staff_lines = get_staff_lines(width, height, in_img, 0.8)
-cleaned, staff_coords = remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses)
+cleaned = in_img
+# cleaned, staff_coords = remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses)
 
 size = int(config.get("size", "size"))
 # resize late because resize early causes the staff lines to disappear
-scaled = resize(cleaned, size) # from helper_methods
-for i in range(len(staff_coords)):
-    staff_coords[i] += (size // 2) - (height // 2)
+scaled = resize(cleaned, size) # from preprocessing
+# for i in range(len(staff_coords)):
+#     staff_coords[i] += (size // 2) - (height // 2)
 
+cv.imwrite('no1.jpg', scaled)
 final = Image.fromarray(scaled)
 
 model = YOLO('best.pt')
@@ -50,6 +54,6 @@ for box, cls, conf in zip(boxes, classes, confidences):
     detected_class = cls
     name = names[int(cls)]
 
-    print(name, detected_class, confidence, x1, y1, x2, y2)
+    print(name, detected_class, confidence, mean((y1, y2)))
 
 print(staff_coords)
