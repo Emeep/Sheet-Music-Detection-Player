@@ -24,14 +24,13 @@ img = cv2.fastNlMeansDenoising(img, None, 10, 7, 21)
 _threshold, in_img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
 staff_lines_thicknesses, staff_lines = get_staff_lines(width, height, in_img, 0.8)
-cleaned = in_img
-# cleaned, staff_coords = remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses)
+cleaned, staff_coords = remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses)
 
 size = int(config.get("size", "size"))
 # resize late because resize early causes the staff lines to disappear
 scaled = resize(cleaned, size) # from preprocessing
-# for i in range(len(staff_coords)):
-#     staff_coords[i] += (size // 2) - (height // 2)
+for i in range(len(staff_coords)):
+    staff_coords[i] += (size // 2) - (height // 2)
 
 cv.imwrite('no1.jpg', scaled)
 final = Image.fromarray(scaled)
