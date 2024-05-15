@@ -28,9 +28,8 @@ cleaned, staff_coords = remove_staff_lines(in_img, width, staff_lines, staff_lin
 
 size = int(config.get("size", "size"))
 # resize late because resize early causes the staff lines to disappear
-scaled = resize(cleaned, size) # from preprocessing
-for i in range(len(staff_coords)):
-    staff_coords[i] += (size // 2) - (height // 2)
+scaled, res_percent, border_top = resize(cleaned, size) # from preprocessing
+staff_coords = resized_staff_coords(staff_coords, res_percent, border_top)
 
 cv.imwrite('no1.jpg', scaled)
 final = Image.fromarray(scaled)

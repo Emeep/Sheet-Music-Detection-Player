@@ -167,3 +167,12 @@ def segmentation(height_before, in_img):
             symbols.append([x, y + height_before, x + w, y + h + height_before])
 
     return symbols
+
+
+def resized_staff_coords(staff_coords, res_percent, border_top):
+    for i in range(len(staff_coords)):
+        print("init", staff_coords[i], res_percent, border_top)
+        staff_coords[i] = round((staff_coords[i] * res_percent) + border_top)
+        print("res", staff_coords[i])
+
+    return staff_coords

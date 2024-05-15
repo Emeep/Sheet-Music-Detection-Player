@@ -73,6 +73,8 @@ def resize(img, size):
     if width >= height:
         y = round(height * (size/width))
         x = size
+
+        res_percent = (y / height)
     else:
         x = round(height * (size//width))
         y = size
@@ -91,7 +93,7 @@ def resize(img, size):
                             cv.BORDER_CONSTANT, None, value = (255,255,255)) 
 
     print(img.shape)
-    return img
+    return img, res_percent, border_y
 
 
 def display(img):

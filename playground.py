@@ -1,6 +1,6 @@
-l = [0, 1, 2, 3]
+l = {'1':1, '2':2, '3':3}
 
-for i in range(len(l)):
-    l[i] += 1
-
-print(l)
+start = 1
+while(l[f'{start}']):
+    print(l)
+    start += 1
