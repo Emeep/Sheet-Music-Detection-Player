@@ -2,6 +2,7 @@ import PIL.Image
 from preprocessing import *
 from staff_removal import *
 from helper_methods import *
+from transcribe import *
 
 import cv2 as cv
 import configparser as cp
@@ -36,7 +37,7 @@ final = Image.fromarray(scaled)
 
 model = YOLO('best.pt')
 results = model.predict(final,
-                        conf=0.1, iou=0.01, save=True, show=True, show_labels=False)
+                        conf=0.1, iou=0.01, save=True, show_labels=False)
 
 boxes = results[0].boxes.xyxy.tolist()
 classes = results[0].boxes.cls.tolist()
@@ -55,3 +56,4 @@ for box, cls, conf in zip(boxes, classes, confidences):
     print(name, detected_class, confidence, mean((y1, y2)))
 
 print(staff_coords)
+print(get_notes(staff_coords))

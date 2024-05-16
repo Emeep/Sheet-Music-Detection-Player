@@ -1,6 +1,8 @@
-l = {'1':1, '2':2, '3':3}
+notes_name = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
 
-start = 1
-while(l[f'{start}']):
-    print(l)
-    start += 1
+start_note = 4 # g
+
+while True:
+    print(notes_name[start_note])
+
+    start_note  = (start_note + 1) % 7
