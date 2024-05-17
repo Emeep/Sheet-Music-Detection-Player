@@ -12,6 +12,7 @@ notes = {'a0':0, 'b0':0,
          'c8':0}
 
 def get_notes(staff_line_pos):
+    notes_name = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
     notes_name_reversed = list(reversed(['c', 'd', 'e', 'f', 'g', 'a', 'b']))
 
     print(notes_name_reversed)
@@ -20,25 +21,28 @@ def get_notes(staff_line_pos):
     start_note = 3 # f
     start_num = 5
 
-    staff_np = np.array(staff_line_pos)
-    diff = mode(np.diff(staff_np))
-
     pos = staff_line_pos[0]
     i = 0
     alt = True
+
+    staff_np = np.array(staff_line_pos)
+    diff = mode(np.diff(staff_np))
+
 
     # negative iteration
     while True:
         try: notes[f'{notes_name_reversed[(start_note + 1) % 7]}{start_num}']
         except: break
 
-        print(f'{notes_name_reversed[start_note]}{start_num}')
-
         if alt:
             pos_center = pos + (diff // 2)
 
             notes[f'{notes_name_reversed[start_note]}{start_num}'] = pos
-            notes[f'{notes_name_reversed[(start_note + 1) % 7]}{start_num}'] = pos_center
+
+            temp_start_num = start_num
+            if start_note + 1 > 6:
+                temp_start_num = start_num - 1
+            notes[f'{notes_name_reversed[(start_note + 1) % 7]}{(temp_start_num)}'] = pos_center
 
             if i <= 3:
                 i += 1
@@ -48,8 +52,8 @@ def get_notes(staff_line_pos):
 
         if notes_name_reversed[start_note] == 'c':
             start_num -= 1
-
         start_note = (start_note + 1) % 7
+        
         if not alt:
             alt = True
         else:
@@ -58,20 +62,40 @@ def get_notes(staff_line_pos):
     if notes['a0'] == 0:
         notes['a0'] = pos
 
-    # negative iteration
-    # while True:
-    #     try: notes[f'{notes_name[start_note]}{start_num - 1}']
-    #     except: break
+    # treble clef highest default staff on f5   
+    start_note = 3 # f
+    start_num = 5
 
-    #     pos_center = pos - diff // 2
+    pos = staff_line_pos[0]
+    i = 0
+    alt = True
+    # positive iteration
+    while True:
+        try: notes[f'{notes_name[(start_note + 1) % 7]}{start_num}']
+        except: break
+        
+        if alt:
+            print(f'{notes_name[start_note]}{start_num}')
+            pos_center = pos - (diff // 2)
 
-    #     notes[f'{notes_name[start_note]}{start_num}'] = pos
-    #     notes[f'{notes_name[start_note]}{start_num - 1}'] = pos_center
+            notes[f'{notes_name[start_note]}{start_num}'] = pos
 
-    #     if i <= 4:
-    #         pos = min(staff_line_pos[i], pos - diff)
-    #     else:
-    #         pos -= diff
+            temp_start_num = start_num
+            if start_note + 1 > 6:
+                temp_start_num = start_num + 1
+            notes[f'{notes_name[(start_note + 1) % 7]}{(temp_start_num)}'] = pos_center
 
+            pos -= diff
 
-    return notes  
+        start_note = (start_note + 1) % 7
+        if notes_name[start_note] == 'c':
+            start_num += 1
+        if not alt:
+            alt = True
+        else:
+            alt = False
+
+    if notes['c8'] == 0:
+        notes['c8'] = pos
+
+    return notes
