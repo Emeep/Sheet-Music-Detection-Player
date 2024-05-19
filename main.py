@@ -44,6 +44,7 @@ classes = results[0].boxes.cls.tolist()
 names = results[0].names
 confidences = results[0].boxes.conf.tolist()
 
+note_list = []
 # Iterate through the results
 for box, cls, conf in zip(boxes, classes, confidences):
     x1, y1, x2, y2 = box
@@ -54,6 +55,10 @@ for box, cls, conf in zip(boxes, classes, confidences):
     name = names[int(cls)]
 
     print(name, detected_class, confidence, mean((y1, y2)))
+    note_list.append(Notehead(name, detected_class, round(mean((x1, x2))), round(mean((y1, y2)))))
 
-print(staff_coords)
-print(get_notes(staff_coords))
+
+note_list = sorted(note_list, key=lambda note: note.x)
+notes_dict = get_notes(staff_coords)
+
+print(get_pitch(notes_dict, note_list))
