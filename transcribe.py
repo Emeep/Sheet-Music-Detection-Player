@@ -1,7 +1,6 @@
 import numpy as np
 from statistics import mode
 import configparser as cp
-from mido import *
 
 from ultralytics import YOLO
 from statistics import mean
