@@ -11,8 +11,7 @@ from ultralytics import YOLO
 
 from statistics import mean
 
-path_in = "input/Screenshot 2024-05-11 135411.png"
-path_out = "output"
+path_in = "input/test.png"
 
 config = cp.ConfigParser()
 config.read('config.ini')
@@ -35,30 +34,13 @@ staff_coords = resized_staff_coords(staff_coords, res_percent, border_top)
 cv.imwrite('no1.jpg', scaled)
 final = Image.fromarray(scaled)
 
-model = YOLO('best.pt')
-results = model.predict(final,
-                        conf=0.1, iou=0.01, save=True, show_labels=False)
+note_list = detect("notehead.pt", final)
+aug_list = detect_aug("others.pt", final)
+print(aug_list)
 
-boxes = results[0].boxes.xyxy.tolist()
-classes = results[0].boxes.cls.tolist()
-names = results[0].names
-confidences = results[0].boxes.conf.tolist()
-
-note_list = []
-# Iterate through the results
-for box, cls, conf in zip(boxes, classes, confidences):
-    x1, y1, x2, y2 = box
-    x1, y1, x2, y2 = round(x1), round(y1), round(x2), round(y2)
-
-    confidence = conf
-    detected_class = cls
-    name = names[int(cls)]
-
-    print(name, detected_class, confidence, mean((y1, y2)))
-    note_list.append(Notehead(name, detected_class, round(mean((x1, x2))), round(mean((y1, y2)))))
-
-
-note_list = sorted(note_list, key=lambda note: note.x)
 notes_dict = get_notes(staff_coords)
+pitch_list = get_pitch(notes_dict, note_list)
+rest_list = detect("others.pt", final)
 
-print(get_pitch(notes_dict, note_list))
+all_list = pitch_list + rest_list # "+ lists"
+all_list = sorted(all_list, key=lambda x: x[1])
