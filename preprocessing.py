@@ -96,6 +96,32 @@ def resize(img, size):
     return img, res_percent, border_y
 
 
+def resizebar(img, staff_height, size, staff_coords):
+    height, width = img.shape
+    init_staff_height = staff_coords[-1] - staff_coords[0]
+    
+    res_percent = (staff_height/init_staff_height)
+    x = round(width * res_percent)
+    y = round(height * res_percent)
+    
+    img = cv.resize(img, (x, y))
+    height, width = img.shape
+    
+    border_y = (size - height)//2
+    border_x = (size - width)//2
+
+    xdiff = size - ((2 * border_x) + width)
+    ydiff = size - ((2 * border_y) + height)
+
+    # top, bottom, left, right
+    img = cv.copyMakeBorder(img, border_y, border_y + ydiff, border_x, border_x + xdiff,
+                            cv.BORDER_CONSTANT, None, value = (255,255,255)) 
+
+    return img, res_percent, border_y
+
+    
+
+
 def display(img):
     cv.namedWindow('image',cv.WINDOW_NORMAL)
     cv.resizeWindow('image', 1920, 1080)

@@ -5,14 +5,15 @@ import configparser as cp
 from ultralytics import YOLO
 from statistics import mean
 
+from music21 import *
+
 class Notehead:
     def __init__(self, type, class_no, x, y, aug):
         self.type = type
-        self.class_no = class_no
         self.x = x
         self.y = y
     def __repr__(self):
-        return repr((self.type, self.class_no, self.x,
+        return repr((self.type, self.x,
                      self.y))
     
     
@@ -114,55 +115,151 @@ def get_notes(staff_line_pos):
 
     return notes
 
-def check_augdot(note_list, augdot_x):
-    res_key, res_val = min(note_list, key=lambda x:abs(x-augdot_x))
-    print(res_key, res_val)
-
-def get_pitch(notes: dict, note_list):
-    pitch_list = []
-
-    for i in note_list:
-        pos = i.y
-        res_key, res_val = min(notes.items(), key=lambda y: abs(pos - y[1]))
+def get_duration(all_list, beam_list, flag_list, aug_list):
+    dur_note = []
+    dur_rest = []
+    
+    for i in all_list:
+        rest = False
         
-        # TODO MAKE A CHORD RECOGNITION AND PLAY
+        if i[0] == 'restDoubleWhole':
+            rest = True
+            dur = 2
+        elif i[0] == 'restWhole':
+            rest = True
+            dur = 1
+        elif i[0] == 'restHalf':
+            rest = True
+            dur = 0.5
+        elif i[0] == 'restQuarter':
+            rest = True
+            dur = 0.25
+        elif i[0] == 'rest8th':
+            rest = True
+            dur = 0.125
+        elif i[0] == 'rest16th':
+            rest = True
+            dur = 0.0625
+        elif i[0] == 'rest32nd':
+            rest = True
+            dur = 0.03125
+        elif i[0] == 'rest64th':
+            rest = True
+            dur = 0.015625
+        elif i[0] == 'rest128th':
+            rest = True
+            dur = 0.0078125
             
+        if rest:
+            i.insert(1, dur)
+            dur_rest.append(i)
+            continue
+
+        if i[0] == 'noteheadDoubleWhole':
+            dur = 2
+        elif i[0] == 'noteheadWhole':
+            dur = 1
+        elif i[0] == 'noteheadHalf':
+            dur = 0.5
+        elif i[0] == 'noteheadBlack':
+            flag_dict = {
+                'flag8thDown': 0.125,
+                'flag8thUp': 0.125,
+                'flag16thDown': 0.0625,
+                'flag16thUp': 0.0625,
+                'flag32ndDown': 0.03125,
+                'flag32ndUp': 0.03125,
+                'flag64thDown': 0.015625,
+                'flag64thUp': 0.015625,
+                'flag128thDown': 0.0078125,
+                'flag128thUp': 0.0078125
+            }
+            
+            try:
+                res = min(flag_list, key=lambda x: abs(i[-1][0] - x[1]))
+                if abs(i[-1][0] - res[1]) < 5:
+                    dur = flag_dict[res[0]]
+                    continue
+            except: pass
+            
+            dur = 0.25
+            for b in beam_list:
+                if i[-1][0] in range(b[0]-5, b[1]+5):
+                    dur = dur / 2
         
-        pitch_list.append((res_key, i.x))
-
-    return pitch_list
-
-
-def create_midi(notes, filename):
+        try:         
+            resaug = min(aug_list, key=lambda x: abs(i[-1][0] - x[0]))
+            diffaug = resaug[0] - i[-1][0]
+            if diffaug < 10 and diffaug > 0:
+                dur = dur + (dur/2)
+        except: pass
+        
+        i.insert(1, dur)
+        dur_note.append(i)
+        
+    return dur_note, dur_rest
+                    
+def get_pitch(staff_notes: dict, all_list, accidental_list, keysig):
     config = cp.ConfigParser()
     config.read('config.ini')
-
-    # Create a new MIDI file
-    mid = MidiFile()
-
-    # Create a track
-    track = MidiTrack()
-    mid.tracks.append(track)
-
-    # Default tempo (adjustable if needed)
-    tempo = (60000 / (int(config.get('midi', 'BPM')))) * 4 # from quarter note BPM to ms per quarter note
-    track.append(MetaMessage('set_tempo', tempo=round(tempo)))
     
-    for note in notes:
-        note_name = note[0]
-        # Extract duration if provided, otherwise default to a quarter note
-        duration = note[1] if len(note) > 1 else 0.25
+    pitch_list = []
+    noteheads = ['noteheadDoubleWhole', 'noteheadWhole', 'noteheadHalf', 'noteheadBlack']
+    
+    acc_dict = {"accidentalDoubleFlat": ["--", set({})],
+            "accidentalDoubleSharp": ["##", set({})],
+            "accidentalFlat": ["-", set({})],
+            "accidentalNatural": ["", set({})],
+            "accidentalSharp": ["#", set({})]
+        }
+    
+    keysig_sharp = ['F', 'C', 'G', 'D', 'A', 'E', 'B']
+    keysig_flat = ['B', 'E', 'A', 'D', 'G', 'C', 'F']
+    
+    if keysig > 0:
+        for i in range(0, keysig):
+            acc_dict["accidentalSharp"][1].add(keysig_sharp[i])
+    elif keysig < 0:
+        for i in range(0, abs(keysig)):
+            acc_dict["accidentalFlat"][1].add(keysig_flat[i])
+    
+    for symbol in all_list:    
+        res = []
+        for pos in range(2, len(symbol)):
+            posx = symbol[pos][0]
+            posy = symbol[pos][1]
+        
+            res_key, res_val = min(staff_notes.items(), key=lambda y: abs(posy - y[1]))
+            
+            base_pitch = res_key[0]
+            acc = ""
+            
+            for key, val in acc_dict.items():
+                if base_pitch in val[1]:
+                    acc = f'{val[0]}'
+            
+            for acc_index in accidental_list:
+                print(int(posx), acc_index[1])
+                dif = int(posx) - int(acc_index[1])
+                if dif < 10 and dif >= 0:
+                    if acc_index[0] == "accidentalNatural":
+                        for key, val in acc_dict.items():
+                            try:
+                                acc_dict[acc_index[0]][1].remove(base_pitch)
+                            except: pass
+                    
+                    print(acc_dict[acc_index[0]][1])
+                    acc_dict[acc_index[0]][1].add(base_pitch)
+                    acc = acc_dict[acc_index[0]][0]
+                    break
+            
+            res_key = res_key[:1] + f'{acc}' + res_key[1:]
+            res.append(res_key)
+        
+        symbol.insert(1, res)
+        pitch_list.append(symbol)
 
-        # Convert note name to MIDI pitch number (C4 = 60)
-        pitch = 60 + (note_name.find('C') - 3) + (len(note_name) - 1) * 12
-
-        # Create note on and off messages
-        velo = int(config.get('midi', 'velocity'))
-        track.append(Message('note_on', note=pitch, velocity=velo, time=0))
-        track.append(Message('note_off', note=pitch, velocity=velo, time=int(duration * 480000)))
-
-    # Save the MIDI file
-    mid.save(f'output/{filename}')
+    return pitch_list
     
 
 def detect(model_name, img):
@@ -171,7 +268,7 @@ def detect(model_name, img):
     
     model = YOLO(model_name)
     results = model.predict(img, imgsz=config.get('size', 'size'),
-                            conf=0.05, iou=0.01, save=True, show_labels=False)
+                            conf=0.05, iou=0.5, save=True, show_labels=False)
 
     boxes = results[0].boxes.xyxy.tolist()
     classes = results[0].boxes.cls.tolist()
@@ -179,27 +276,66 @@ def detect(model_name, img):
     confidences = results[0].boxes.conf.tolist()
 
     note_list = []
-    notehead = ['noteheadBlack', 'noteheadHalf', 'noteheadWhole']
-    rest = ["rest128th","rest16th","rest32nd","rest64th","rest8th",
-            "restDoubleWhole","restHalf",]
+    retothers = False
+    
+    rest_list = []
+    acc_list = []
+    beam_list = []
+    flag_list = []
     # Iterate through the results
     for box, cls, conf in zip(boxes, classes, confidences):
         x1, y1, x2, y2 = box
         x1, y1, x2, y2 = round(x1), round(y1), round(x2), round(y2)
 
         confidence = conf
-        detected_class = cls
+        # detected_class = cls
         name = names[int(cls)]
 
         midx = round(mean((x1, x2)))
         midy = round(mean((y1, y2)))
-        print(name, detected_class, confidence, mean((y1, y2)))
-        if name in notehead:
-            note_list.append(Notehead(name, detected_class, midx, midy, False))
-        elif name in rest:
-            note_list.append((name, midx))
+        
+        print(name, midx, confidence)
+        
+        if model_name == 'notehead.pt':
+            chord = False 
+            for note_index in range(len(note_list)):
+                if abs(note_list[note_index][-1][0] - midx) < 5:
+                    note_list[note_index].append([midx, midy])
+                    chord = True
+                    break
             
+            if not chord:
+                note_list.append([name, [midx, midy]])
+        else:
+            retothers = True
+            rest = ["rest128th","rest16th","rest32nd","rest64th","rest8th",
+                    "restDoubleWhole","restHalf",]
+            accidental = ["accidentalDoubleFlat","accidentalDoubleSharp",
+                          "accidentalFlat","accidentalNatural","accidentalSharp"]
+            # flags = ["flag128thDown","flag128thUp","flag16thDown","flag16thUp","flag32ndDown","flag32ndUp","flag64thDown","flag64thUp","flag8thDown","flag8thUp",]
             
+            if name in rest:
+                rest_list.append([name, [midx]])
+            elif name in accidental:
+                acc_list.append([name, midx])
+            elif name == "beam":
+                beam_list.append([x1, x2])
+            else:
+                flag_list.append([name, midx])
+                
+
+    if model_name == "others.pt":
+        retothers = True
+        
+    if retothers:
+        rest_list = sorted(rest_list, key=lambda x: x[-1][0])
+        acc_list = sorted(acc_list, key=lambda x: x[-1])
+        beam_list = sorted(beam_list, key=lambda x: x[0])
+        flag_list = sorted(flag_list, key=lambda x: x[-1])
+        
+        return rest_list, acc_list, beam_list, flag_list
+    
+    note_list = sorted(note_list, key=lambda x: x[-1][0])
     return note_list
 
 
@@ -208,34 +344,76 @@ def detect_aug(model_name, img):
     config.read('config.ini')
     
     model = YOLO(model_name)
-    results = model.predict(img, imgsz=config.get('size', 'size'),
-                            conf=0.05, iou=0.01, save=True, show_labels=False)
+    results = model.predict(img, imgsz=config.get('size', 'size'), classes=[21],
+                            conf=0.001, iou=0.01, save=True, show_labels=False)
 
     boxes = results[0].boxes.xyxy.tolist()
     classes = results[0].boxes.cls.tolist()
     names = results[0].names
     confidences = results[0].boxes.conf.tolist()
-
-    note_list = []
+    
+    aug_list = []
     # Iterate through the results
     for box, cls, conf in zip(boxes, classes, confidences):
         x1, y1, x2, y2 = box
         x1, y1, x2, y2 = round(x1), round(y1), round(x2), round(y2)
 
         confidence = conf
-        detected_class = cls
+        # detected_class = cls
         name = names[int(cls)]
+        
+        print(name, confidence)
 
         midx = round(mean((x1, x2)))
-        # midy = round(mean((y1, y2)))
-        print(name, detected_class, confidence, mean((y1, y2)))
-        if name == "augmentationDot":
-            try:
-                if note_list[-1][-1] - midx < 5:
-                    continue
-            except:
-                pass
+        midy = round(mean((y1, y2)))
+        
+        if name == "augmentationDot":     
+            chord = False 
+            for note_index in range(len(aug_list)):
+                dif = aug_list[note_index][0] - midx
+                if dif < 5 and dif >= 0:
+                    chord = True
+                    break
             
-            note_list.append((name, midx))
+            if not chord:
+                aug_list.append([midx])
+
+    aug_list = sorted(aug_list, key=lambda x: x[0])
+    return aug_list
+    
+def create_midi(all_list, BPM):
+    config = cp.ConfigParser()
+    config.read('config.ini')
+    
+    s = stream.Stream()
+    s.append(tempo.MetronomeMark(number=BPM))
+    
+    rest = ["rest128th","rest16th","rest32nd","rest64th","rest8th",
+        "restDoubleWhole","restHalf",]
+    
+    for symbol in all_list:
+        name = symbol[0]
+        
+        if name in rest:
+            dur = symbol[1]
             
-    return note_list
+            r = note.Rest()
+            r.duration.quarterLength = dur * 4
+            s.append(r)
+            continue
+        
+        dur = symbol[2]
+        pitch = symbol[1]
+        
+        if len(pitch) > 1:
+            c = chord.Chord(pitch)
+            c.duration.quarterLength = dur * 4
+            s.append(c)
+        else:
+            n = note.Note(pitch[0])
+            n.duration.quarterLength = dur * 4
+            s.append(n)    
+
+    s.write('midi', fp='output/output.mid')
+        
+    
