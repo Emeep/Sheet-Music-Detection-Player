@@ -381,11 +381,15 @@ def detect_aug(model_name, img):
     aug_list = sorted(aug_list, key=lambda x: x[0])
     return aug_list
     
-def create_midi(all_list, BPM):
+def create_midi(iter, all_list, BPM):
     config = cp.ConfigParser()
     config.read('config.ini')
     
     s = stream.Stream()
+    
+    if iter > 0:
+        s.append(converter.parse(f'output/output{iter - 1}.mid')
+)    
     s.append(tempo.MetronomeMark(number=BPM))
     
     rest = ["rest128th","rest16th","rest32nd","rest64th","rest8th",
@@ -414,6 +418,6 @@ def create_midi(all_list, BPM):
             n.duration.quarterLength = dur * 4
             s.append(n)    
 
-    s.write('midi', fp='output/output.mid')
+    s.write('midi', fp=f'output/output{iter}.mid')
         
     
