@@ -177,8 +177,11 @@ def get_duration(all_list, beam_list, flag_list, aug_list):
             
             try:
                 res = min(flag_list, key=lambda x: abs(i[-1][0] - x[1]))
+                print("iahtemylifeimkillmyselfnow", res[0], abs(i[-1][0] - res[1]))
                 if abs(i[-1][0] - res[1]) < 5:
                     dur = flag_dict[res[0]]
+                    i.insert(1, dur)
+                    dur_note.append(i)
                     continue
             except: pass
             
@@ -381,15 +384,11 @@ def detect_aug(model_name, img):
     aug_list = sorted(aug_list, key=lambda x: x[0])
     return aug_list
     
-def create_midi(iter, all_list, BPM):
+def create_midi(all_list, BPM):
     config = cp.ConfigParser()
     config.read('config.ini')
     
     s = stream.Stream()
-    
-    if iter > 0:
-        s.append(converter.parse(f'output/output{iter - 1}.mid')
-)    
     s.append(tempo.MetronomeMark(number=BPM))
     
     rest = ["rest128th","rest16th","rest32nd","rest64th","rest8th",
@@ -418,6 +417,6 @@ def create_midi(iter, all_list, BPM):
             n.duration.quarterLength = dur * 4
             s.append(n)    
 
-    s.write('midi', fp=f'output/output{iter}.mid')
+    s.write('midi', fp=f'output/output.mid')
         
     

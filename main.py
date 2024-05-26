@@ -23,7 +23,7 @@ images = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_mu
 keysig = st.slider("Insert Keysig from how many sharps and flats there are (e.g. 4 sharps = 4, 4 flats = -4)", -7, 7, 0)
 bpm = st.number_input("Insert BPM")
 
-i = -1
+all_list = []
 for img_in in images:
     print("uploaded file : ", img_in._file_urls.upload_url)
 
@@ -58,19 +58,21 @@ for img_in in images:
 
     notes_dict = get_notes(staff_coords)
 
-    all_list = note_list + rest_list
-    all_list = sorted(all_list, key=lambda x: x[-1][0])
+    symbol_list = note_list + rest_list
+    symbol_list = sorted(symbol_list, key=lambda x: x[-1][0])
 
-    dur_notes, dur_rest = get_duration(all_list, beam_list, flag_list, aug_list)
+    dur_notes, dur_rest = get_duration(symbol_list, beam_list, flag_list, aug_list)
 
     pitch_list = get_pitch(notes_dict, dur_notes, acc_list, keysig)
-    all_list = sorted(pitch_list + rest_list, key=lambda x: x[-1][0])
-    print(all_list)
-
-    i += 1
-    create_midi(i, all_list, bpm)
+    symbol_list = sorted(pitch_list + rest_list, key=lambda x: x[-1][0])
+    print(symbol_list)
     
-ZipFile(f'output.zip', mode='w').write(f'output/output{i}.mid')
+    all_list.extend(symbol_list)
+    
+
+create_midi(all_list, bpm)
+    
+ZipFile(f'output.zip', mode='w').write(f'output/output.mid')
 
 with open(f'output.zip', "rb") as fp:
     btn = st.download_button(
