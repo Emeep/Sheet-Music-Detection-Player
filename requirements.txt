@@ -6,5 +6,3 @@ music21
 scikit-image
 matplotlib
 dill
-
-opencv-python-headless
