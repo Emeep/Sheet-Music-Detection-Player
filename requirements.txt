@@ -2,7 +2,6 @@ pillow
 numpy
 opencv-python
 ultralytics
-glob
 gdown
 music21
 scikit-image
