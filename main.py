@@ -15,9 +15,21 @@ import glob
 import streamlit as st
 from zipfile import ZipFile
 
+import gdown as gd
+
 out = glob.glob("output/*")
 for f in out:
     os.remove(f)
+    
+weights = glob.glob("weights/*")
+for f in weights:
+    os.remove(f)
+
+if os.path.exists("weights"):
+  os.rmdir("weights")
+
+url_weights = "https://drive.google.com/drive/folders/1vwlLz2dVbfybKPyeU3UcS9pHeyRBd1JU?usp=sharing"
+gd.download_folder(url_weights)
 
 images = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
 keysig = st.slider("Insert Keysig from how many sharps and flats there are (e.g. 4 sharps = 4, 4 flats = -4)", -7, 7, 0)
@@ -52,9 +64,9 @@ for img_in in images:
 
     final = Image.fromarray(scaled)
 
-    note_list = detect("notehead.pt", final)
-    rest_list, acc_list, beam_list, flag_list = detect("others.pt", final)
-    aug_list = detect_aug("others.pt", final)
+    note_list = detect("weights/notehead.pt", final)
+    rest_list, acc_list, beam_list, flag_list = detect("weights/others.pt", final)
+    aug_list = detect_aug("weights/others.pt", final)
 
     notes_dict = get_notes(staff_coords)
 

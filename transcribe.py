@@ -299,7 +299,7 @@ def detect(model_name, img):
         
         print(name, midx, confidence)
         
-        if model_name == 'notehead.pt':
+        if model_name == 'weights/notehead.pt':
             chord = False 
             for note_index in range(len(note_list)):
                 if abs(note_list[note_index][-1][0] - midx) < 5:
@@ -327,7 +327,7 @@ def detect(model_name, img):
                 flag_list.append([name, midx])
                 
 
-    if model_name == "others.pt":
+    if model_name == "weights/others.pt":
         retothers = True
         
     if retothers:
