@@ -1,5 +1,5 @@
 import subprocess as sp
-sp.Popen('pip uninstall opencv-python')
+sp.Popen('pip uninstall opencv-python', shell=True)
 
 from PIL import Image
 from preprocessing import *
