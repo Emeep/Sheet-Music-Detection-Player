@@ -1,9 +1,10 @@
 pillow
 numpy
-opencv-python-headless
 ultralytics
 gdown
 music21
 scikit-image
 matplotlib
 dill
+
+opencv-python-headless
