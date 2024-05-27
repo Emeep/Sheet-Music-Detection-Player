@@ -7,4 +7,3 @@ music21
 scikit-image
 matplotlib
 dill
-pickle
