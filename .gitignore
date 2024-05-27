@@ -6,6 +6,7 @@ __pycache__/
 tempCodeRunnerFile.py
 # C extensions
 *.so
+output.zip
 
 # Distribution / packaging
 .Python
