@@ -1,6 +1,6 @@
 pillow
 numpy
-opencv-python-headless
+opencv-python
 ultralytics
 gdown
 music21
