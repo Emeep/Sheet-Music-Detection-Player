@@ -2,6 +2,7 @@ import subprocess as sp
 import streamlit as st
 
 sp.Popen('pip uninstall opencv-python', shell=True)
+sp.Popen('pip install opencv-python-headless', shell=True)
 st.write("Uninstalled opencv-python")
 
 from PIL import Image
