@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 
 tempCodeRunnerFile.py
-*.pt
 # C extensions
 *.so
 
