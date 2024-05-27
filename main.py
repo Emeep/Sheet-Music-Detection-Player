@@ -1,5 +1,8 @@
 import subprocess as sp
+import streamlit as st
+
 sp.Popen('pip uninstall opencv-python', shell=True)
+st.write("Uninstalled opencv-python")
 
 from PIL import Image
 from preprocessing import *
@@ -15,7 +18,6 @@ from ultralytics import YOLO
 
 import os
 import glob
-import streamlit as st
 from zipfile import ZipFile
 
 import gdown as gd
