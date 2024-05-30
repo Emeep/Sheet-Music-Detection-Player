@@ -29,9 +29,9 @@ from huggingface_hub import hf_hub_download
 # for f in out:
 #     os.remove(f)
     
-weights = glob.glob("weights/*")
-for f in weights:
-    os.remove(f)
+# weights = glob.glob("weights/*")
+# for f in weights:
+#     os.remove(f)
 
 hf_hub_download(repo_id="Parinpat/Deepscore", local_dir="weights", filename="notehead.pt")
 hf_hub_download(repo_id="Parinpat/Deepscore", local_dir="weights", filename="others.pt")
