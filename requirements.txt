@@ -7,3 +7,4 @@ scikit-image
 matplotlib
 dill
 opencv-python-headless
+huggingface-hub
