@@ -23,7 +23,7 @@ import os
 import glob
 from zipfile import ZipFile
 
-import gdown as gd
+from huggingface_hub import hf_hub_download
 
 out = glob.glob("output/*")
 for f in out:
@@ -33,11 +33,9 @@ weights = glob.glob("weights/*")
 for f in weights:
     os.remove(f)
 
-if os.path.exists("weights"):
-  os.rmdir("weights")
-
-url_weights = "https://drive.google.com/drive/folders/1vwlLz2dVbfybKPyeU3UcS9pHeyRBd1JU?usp=sharing"
-gd.download_folder(url_weights)
+# TODO fix this
+hf_hub_download(repo_id="Parinpat/Deepscore", local_dir="weights", filename="notehead.pt")
+hf_hub_download(repo_id="Parinpat/Deepscore", local_dir="weights", filename="others.pt")
 
 images = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
 keysig = st.slider("Insert Keysig from how many sharps and flats there are (e.g. 4 sharps = 4, 4 flats = -4)", -7, 7, 0)
