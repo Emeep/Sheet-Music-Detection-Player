@@ -10,6 +10,7 @@ tempCodeRunnerFile.py
 # custom files
 output.zip
 temp.py
+weights/
 
 # Distribution / packaging
 .Python

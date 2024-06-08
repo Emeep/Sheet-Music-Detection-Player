@@ -5,7 +5,9 @@ proc = sp.Popen('pip uninstall opencv-python', shell=True, stdin=sp.PIPE, stdout
 proc.stdin.write(b'Y\n')
 
 sp.Popen('pip install opencv-python-headless', shell=True)
-st.write("Uninstalled opencv-python")
+st.write("Insert Image, Set Keysig, Set BPM")
+st.write("Uploaded Image must be an Image cut from a staff, Example of an acceptable image below")
+st.image("example.png")
 
 from PIL import Image
 from preprocessing import *
@@ -39,6 +41,7 @@ hf_hub_download(repo_id="Parinpat/Deepscore", local_dir="weights", filename="oth
 images = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
 keysig = st.slider("Insert Keysig from how many sharps and flats there are (e.g. 4 sharps = 4, 4 flats = -4)", -7, 7, 0)
 bpm = st.number_input("Insert BPM")
+st.write("If there is a divide by zero error, set tempo to something other than 0")
 
 all_list = []
 for img_in in images:
@@ -51,6 +54,7 @@ for img_in in images:
     config.read('config.ini')
 
     img = cv.cvtColor(img_arr, cv.COLOR_BGR2GRAY)
+    ret, img = cv2.threshold(img, 170, 255, cv2.THRESH_BINARY) 
     # img = resize(img, int(config.get("size", "size"))) # from helper_methods
     height, width = img.shape
 
