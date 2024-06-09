@@ -177,7 +177,6 @@ def get_duration(all_list, beam_list, flag_list, aug_list):
             
             try:
                 res = min(flag_list, key=lambda x: abs(i[-1][0] - x[1]))
-                print("iahtemylifeimkillmyselfnow", res[0], abs(i[-1][0] - res[1]))
                 if abs(i[-1][0] - res[1]) < 5:
                     dur = flag_dict[res[0]]
                     i.insert(1, dur)
@@ -312,7 +311,7 @@ def detect(model_name, img):
         else:
             retothers = True
             rest = ["rest128th","rest16th","rest32nd","rest64th","rest8th",
-                    "restDoubleWhole","restHalf",]
+                    "restDoubleWhole","restHalf", "restQuarter", 'restWhole']
             accidental = ["accidentalDoubleFlat","accidentalDoubleSharp",
                           "accidentalFlat","accidentalNatural","accidentalSharp"]
             # flags = ["flag128thDown","flag128thUp","flag16thDown","flag16thUp","flag32ndDown","flag32ndUp","flag64thDown","flag64thUp","flag8thDown","flag8thUp",]
@@ -392,7 +391,7 @@ def create_midi(all_list, BPM):
     s.append(tempo.MetronomeMark(number=BPM))
     
     rest = ["rest128th","rest16th","rest32nd","rest64th","rest8th",
-        "restDoubleWhole","restHalf",]
+        "restDoubleWhole","restHalf","restQuarter",'restWhole']
     
     for symbol in all_list:
         name = symbol[0]
