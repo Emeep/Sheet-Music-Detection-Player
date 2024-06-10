@@ -41,7 +41,7 @@ hf_hub_download(repo_id="Parinpat/Deepscore", local_dir="weights", filename="oth
 images = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
 keysig = st.slider("Insert Keysig from how many sharps and flats there are (e.g. 4 sharps = 4, 4 flats = -4)", -7, 7, 0)
 bpm = st.number_input("Insert BPM")
-st.write("If there is a divide by zero error, set tempo to something other than 0")
+st.write("If there is a divide by zero error, set BPM to something other than 0")
 
 all_list = []
 for img_in in images:
