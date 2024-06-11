@@ -8,6 +8,7 @@ sp.Popen('pip install opencv-python-headless', shell=True)
 st.write("Insert Image, Set Keysig, Set BPM")
 st.write("Uploaded Image must be an Image cut from a staff, Example of an acceptable image below")
 st.image("example.png")
+st.write("See results using a MIDI Viewer | You can use this: https://signal.vercel.app/edit")
 
 from PIL import Image
 from preprocessing import *
